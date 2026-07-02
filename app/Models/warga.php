@@ -17,4 +17,9 @@ class Warga extends Authenticatable
         'no_hp',
         'alamat',
     ];
+
+    public function rt()
+    {
+        return $this->belongsTo(rt::class, 'rt_id');
+    }
 }

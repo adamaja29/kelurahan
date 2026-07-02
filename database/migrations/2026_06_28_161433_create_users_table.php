@@ -25,6 +25,8 @@ return new class extends Migration
             ]);
             $table->foreignId('rt_id')->nullable()->constrained('rt')->nullOnDelete();
             $table->foreignId('rw_id')->nullable()->constrained('rw')->nullOnDelete();
+            $table->enum('status', ['aktif', 'nonaktif'])
+              ->default('aktif');
             $table->rememberToken();
             $table->timestamps();
         });

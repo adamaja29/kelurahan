@@ -55,7 +55,7 @@ class authController extends Controller
         return back()->with('warning', 'Email atau Password salah.');
     }
 
-     public function logout(){
+     public function logout() {
         if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
 

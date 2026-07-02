@@ -41,14 +41,16 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('12345678'),
-            'role' => 'admin'
+            'role' => 'admin',
+            'status' => 'aktif'
         ]);
 
         User::create([
             'nama' => 'Lurah',
             'email' => 'lurah@gmail.com',
             'password' => Hash::make('12345678'),
-            'role' => 'lurah'
+            'role' => 'lurah',
+            'status' => 'aktif'
         ]);
 
         User::create([
@@ -56,7 +58,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'rw001@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'rw',
-            'rw_id' => $rw1->id
+            'rw_id' => $rw1->id,
+            'status' => 'aktif'
         ]);
 
         User::create([
@@ -64,7 +67,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'rt001@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'rt',
-            'rt_id' => $rt1->id
+            'rt_id' => $rt1->id,
+            'status' => 'aktif'
         ]);
 
         // ==========================

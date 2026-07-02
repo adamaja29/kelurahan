@@ -12,4 +12,9 @@ class rt extends Model
         'rw_id',
         'nomor_rt',
     ];
+
+    public function rw()
+    {
+        return $this->belongsTo(rw::class, 'rw_id');
+    }
 }

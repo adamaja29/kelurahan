@@ -81,8 +81,8 @@
                 <span class="nav-link-title"> Wilayah </span>
               </a>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ route ('admin.wilayah.rt') }}"> RT </a>
                 <a class="dropdown-item" href="{{ route ('admin.wilayah.rw')}}"> RW </a>
+                <a class="dropdown-item" href="{{ route ('admin.wilayah.rt') }}"> RT </a>
               </div>
             </li>
             <li class="nav-item m-2 ">

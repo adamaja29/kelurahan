@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('rw', function (Blueprint $table) {
             $table->id();
             $table->string('nomor_rw', 3)->unique();
+            $table->string('nama_wilayah', 255);
             $table->timestamps();
         });
     }

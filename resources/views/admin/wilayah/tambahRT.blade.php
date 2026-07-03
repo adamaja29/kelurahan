@@ -1,12 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Wilayah RT')
+@section('title', 'Wilayah Wilayah RT')
 
 @section('content')
 <div class="container-xl">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Edit Wilayah RT</h3>
+            <h3 class="card-title">Tambah Wilayah RT</h3>
+            <a href="{{ route('admin.wilayah.rt') }}" class="btn btn-sm btn-outline-secondary">Kembali</a>
         </div>
 
         <div class="card-body">
@@ -24,7 +25,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.wilayah.rt.update', $rtModel->id) }}" method="POST">
+            <form action="#" method="POST">
                 @csrf
                 @method('PUT')
 

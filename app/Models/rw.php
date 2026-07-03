@@ -10,5 +10,6 @@ class rw extends Model
 
     protected $fillable = [
         'nomor_rw',
+        'nama_wilayah'
     ];
 }

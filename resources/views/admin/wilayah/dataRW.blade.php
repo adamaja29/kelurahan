@@ -7,6 +7,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Data Wilayah RW</h3>
+            <a href="{{ route('admin.wilayah.rw.create') }}" class="btn btn-sm btn-primary">Tambah Wilayah RW</a>
         </div>
 
         <div class="card-body">
@@ -16,6 +17,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nomor RW</th>
+                            <th>Nama Daerah / Wilayah</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -24,6 +26,7 @@
                             <tr>
                                 <td>{{ $rws->firstItem() + $index }}</td>
                                 <td>{{ $rw->nomor_rw }}</td>
+                                <td>{{ $rw->nama_wilayah }}</td>
                                 <td>
                                     <a href="{{ route('admin.wilayah.rw.edit', $rw->id) }}" class="btn btn-sm btn-warning">Edit</a>
                                     <form action="{{ route('admin.wilayah.rw.delete', $rw->id) }}" method="POST" class="d-inline">

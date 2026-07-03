@@ -7,7 +7,6 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Edit Wilayah RW</h3>
-            <a href="{{ route('admin.wilayah.rw') }}" class="btn btn-sm btn-outline-secondary">Kembali</a>
         </div>
 
         <div class="card-body">
@@ -33,6 +32,10 @@
                     <div class="col-md-6">
                         <label class="form-label">Nomor RW</label>
                         <input type="text" name="nomor_rw" class="form-control" value="{{ old('nomor_rw', $rwModel->nomor_rw) }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Nama Daerah / Wilayah</label>
+                        <input type="text" name="nama_wilayah" class="form-control" value="{{ old('nama_wilayah', $rwModel->nama_wilayah) }}" required>
                     </div>
 
                     <div class="col-12 d-flex justify-content-end gap-2 mt-2">

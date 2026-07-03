@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
         // RW
         // ==========================
         $rw1 = rw::create([
-            'nomor_rw' => '001'
+            'nomor_rw' => '001',
+            'nama_wilayah' => 'Perumahan Melati Indah'
         ]);
 
         // ==========================

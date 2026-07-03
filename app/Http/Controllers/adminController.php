@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class adminController extends Controller {
+
+    // CRUD WARGA
     public function dataWarga(Request $request) {
         $search = trim((string) $request->input('search', ''));
 
@@ -66,6 +68,31 @@ class adminController extends Controller {
         return redirect()->route('admin.dataWarga')->with('success', 'Data warga berhasil dihapus.');
     }
 
+
+    // CRUD USER RW
+    public function dataRW(Request $request) {
+        $search = trim((string) $request->input('search', ''));
+        $users = User::with(['rt.rw', 'rw'])->where('role', 'rw')->when($search !== '', fn($query) => $query->where(function ($query) use ($search) {
+                $query->where('nama', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            }))->latest()->paginate(10)->withQueryString();
+
+        return view('admin.rw.data', compact('users', 'search'));
+    }
+
+    public function createRWUser() {
+        $rws = Rw::whereNotIn('id', function ($query) {
+        $query->select('rw_id')
+              ->from('users')
+              ->where('role', 'rw')
+              ->whereNotNull('rw_id');
+        })->orderBy('nomor_rw')->get();
+
+        return view('admin.rw.create', compact('rws'));
+    }
+
+
+    // CRUD USER RT
     public function dataRT(Request $request) {
         $search = trim((string) $request->input('search', ''));
         $users = User::with(['rt.rw', 'rw'])->where('role', 'rt')->when($search !== '', fn($query) => $query->where(function ($query) use ($search) {
@@ -138,27 +165,8 @@ class adminController extends Controller {
         return redirect()->route('admin.dataRT')->with('success', 'Data user RT berhasil dihapus.');
     }
 
-    public function dataRW(Request $request) {
-        $search = trim((string) $request->input('search', ''));
-        $users = User::with(['rt.rw', 'rw'])->where('role', 'rw')->when($search !== '', fn($query) => $query->where(function ($query) use ($search) {
-                $query->where('nama', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            }))->latest()->paginate(10)->withQueryString();
 
-        return view('admin.rw.data', compact('users', 'search'));
-    }
-
-    public function createRWUser() {
-        $rws = Rw::whereNotIn('id', function ($query) {
-        $query->select('rw_id')
-              ->from('users')
-              ->where('role', 'rw')
-              ->whereNotNull('rw_id');
-        })->orderBy('nomor_rw')->get();
-
-    return view('admin.rw.create', compact('rws'));
-    }
-
+    // CRUD TABEL USER
     public function dataLurah(Request $request) {
         $role = $request->input('role');
         $search = trim((string) $request->input('search', ''));
@@ -196,19 +204,62 @@ class adminController extends Controller {
         return redirect()->route($redirectRoute)->with('success', 'Data user berhasil dihapus.');
     }
 
-    public function dataWilayahRT() {
-        $rts = rt::with('rw')->orderBy('id')->paginate(10);
 
-        return view('admin.wilayah.dataRT', compact('rts'));
-    }
-
+    // CRUD WILAYAH RW
     public function dataWilayahRW() {
         $rws = rw::orderBy('id')->paginate(10);
 
         return view('admin.wilayah.dataRW', compact('rws'));
     }
 
-    // ===== CRUD Wilayah RT =====
+    public function createWilayahRW() {
+        return view('admin.wilayah.tambahRW');
+    }
+
+    public function storeWilayahRW(Request $request) {
+        $validated = $request->validate([
+            'nomor_rw' => ['required', 'string', 'max:255'],
+            'nama_wilayah' => ['required', 'string', 'max:255'],
+        ]);
+
+        rw::create($validated);
+
+        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil ditambahkan.');
+    }
+
+    public function editWilayahRW(rw $rwModel) {
+        return view('admin.wilayah.editRW', ['rwModel' => $rwModel]);
+    }
+
+    public function updateWilayahRW(Request $request, rw $rwModel) {
+        $validated = $request->validate([
+            'nomor_rw' => ['required', 'string', 'max:255'],
+            'nama_wilayah' => ['required', 'string', 'max:255'],
+        ]);
+
+        $rwModel->update($validated);
+
+        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil diperbarui.');
+    }
+
+    public function deleteWilayahRW(rw $rwModel) {
+        $rwModel->delete();
+
+        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil dihapus.');
+    }
+
+
+    // CRUD WILAYAH RT
+    public function dataWilayahRT() {
+        $rts = rt::with('rw')->orderBy('id')->paginate(10);
+
+        return view('admin.wilayah.dataRT', compact('rts'));
+    }
+
+    public function createWilayahRT() {
+        return view('admin.wilayah.tambahRT');
+    }
+
     public function editWilayahRT(rt $rtModel) {
         return view('admin.wilayah.editRT', ['rtModel' => $rtModel]);
     }
@@ -227,26 +278,5 @@ class adminController extends Controller {
         $rtModel->delete();
 
         return redirect()->route('admin.wilayah.rt')->with('success', 'Data RT berhasil dihapus.');
-    }
-
-    // ===== CRUD Wilayah RW =====
-    public function editWilayahRW(rw $rwModel) {
-        return view('admin.wilayah.editRW', ['rwModel' => $rwModel]);
-    }
-
-    public function updateWilayahRW(Request $request, rw $rwModel) {
-        $validated = $request->validate([
-            'nomor_rw' => ['required', 'string', 'max:255'],
-        ]);
-
-        $rwModel->update($validated);
-
-        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil diperbarui.');
-    }
-
-    public function deleteWilayahRW(rw $rwModel) {
-        $rwModel->delete();
-
-        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil dihapus.');
     }
 }

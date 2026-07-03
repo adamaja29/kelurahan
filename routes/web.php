@@ -90,6 +90,14 @@ Route::middleware(['role:admin'])->group(function () {
     Route::put('/admin/wilayah/rt/{rtModel}', [adminController::class, 'updateWilayahRT'])->name('admin.wilayah.rt.update');
     Route::delete('/admin/wilayah/rt/{rtModel}', [adminController::class, 'deleteWilayahRT'])->name('admin.wilayah.rt.delete');
     
+
+    //CRUD JENIS SURAT
+    Route::get('/admin/jenis-surat', [adminController::class, 'dataJenisSurat'])->name('admin.dataJenisSurat');
+    Route::get('/admin/jenis-surat/create', [adminController::class, 'createJenisSurat'])->name('admin.jenisSurat.create');
+    Route::post('/admin/jenis-surat', [adminController::class, 'storeJenisSurat'])->name('admin.jenisSurat.store');
+    Route::get('/admin/jenis-surat/{jenisSurat}/edit', [adminController::class, 'editJenisSurat'])->name('admin.jenisSurat.edit');
+    Route::put('/admin/jenis-surat/{jenisSurat}', [adminController::class, 'updateJenisSurat'])->name('admin.jenisSurat.update');
+    Route::delete('/admin/jenis-surat/{jenisSurat}', [adminController::class, 'deleteJenisSurat'])->name('admin.jenisSurat.delete');
 });
 
 Route::middleware(['role:rw'])->group(function () {

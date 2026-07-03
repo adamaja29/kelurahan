@@ -7,7 +7,6 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Tambah Data User RT</h3>
-            <a href="{{ route('admin.dataRT') }}" class="btn btn-sm btn-outline-secondary">Kembali</a>
         </div>
 
         <div class="card-body">
@@ -51,8 +50,7 @@
                             @foreach($rts as $rt)
 
                                 <option value="{{ $rt->id }}">
-                                    RW {{ $rt->rw->nomor_rw }} -
-                                    RT {{ $rt->nomor_rt }}
+                                    RT {{ $rt->nomor_rt }} - RW {{ $rt->rw->nomor_rw }}
                                 </option>
 
                             @endforeach

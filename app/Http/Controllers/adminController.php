@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\jenis_surat;
 use App\Models\User;
 use App\Models\Warga;
 use App\Models\rt;
@@ -117,7 +118,16 @@ class adminController extends Controller {
     }
 
     public function createRTUser() {
-        $rts = rt::with(['rw'])->orderBy('id')->get();
+        $rts = Rt::with('rw')
+        ->whereNotIn('id', function ($query) {
+            $query->select('rt_id')
+                ->from('users')
+                ->where('role', 'rt')
+                ->whereNotNull('rt_id');
+        })
+        ->orderBy('rw_id')
+        ->orderBy('nomor_rt')
+        ->get();
 
         return view('admin.rt.create', compact('rts'));
     }
@@ -150,7 +160,20 @@ class adminController extends Controller {
 
     public function editRTUser(User $user) {
         abort_unless($user->role === 'rt', 404);
-        $rts = rt::with(['rw'])->orderBy('id')->get();
+
+        $rts = Rt::with('rw')
+            ->where(function ($query) use ($user) {
+                $query->whereNotIn('id', function ($subQuery) {
+                    $subQuery->select('rt_id')
+                        ->from('users')
+                        ->where('role', 'rt')
+                        ->whereNotNull('rt_id');
+                })
+                ->orWhere('id', $user->rt_id);
+            })
+            ->orderBy('rw_id')
+            ->orderBy('nomor_rt')
+            ->get();
 
         return view('admin.rt.edit', compact('user', 'rts'));
     }
@@ -400,5 +423,83 @@ class adminController extends Controller {
                 ->with('error', 'Tidak dapat menghapus data RT karena masih memiliki relasi dengan data lain: ' . $e->getMessage());
         }
     }
+
+
+    //CRUD JENIS SURAT
+    public function dataJenisSurat() {
+        $jenisSurats = jenis_surat::orderBy('id')->paginate(10);
+
+        return view('admin.jenisSurat.data', compact('jenisSurats'));
     }
+
+    public function createJenisSurat() {
+        return view('admin.jenisSurat.tambah');
+    }
+
+    public function storeJenisSurat(Request $request) {
+        try {
+            $validated = $request->validate([
+                'nama' => ['required', 'string', 'max:255'],
+                'kode_surat' => ['required', 'string', 'max:50', 'unique:jenis_surat,kode_surat'],
+                'perlu_pengantar' => ['nullable', 'in:on,1,0'],
+            ]);
+
+            $validated['perlu_pengantar'] = $request->has('perlu_pengantar') ? 1 : 0;
+
+            jenis_surat::create([
+                'nama' => $validated['nama'],
+                'kode_surat' => $validated['kode_surat'],
+                'perlu_pengantar' => $validated['perlu_pengantar'],
+            ]);
+
+            return redirect()->route('admin.dataJenisSurat')
+                ->with('success', 'Jenis surat berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
+    }
+
+    public function editJenisSurat(jenis_surat $jenisSurat) {
+        return view('admin.jenisSurat.editJenisSurat', compact('jenisSurat'));
+    }
+
+    public function updateJenisSurat(Request $request, jenis_surat $jenisSurat) {
+        try {
+            $validated = $request->validate([
+                'nama' => ['required', 'string', 'max:255'],
+                'kode_surat' => ['required', 'string', 'max:50', 'unique:jenis_surat,kode_surat,' . $jenisSurat->id],
+                'perlu_pengantar' => ['nullable', 'in:on,1,0'],
+            ]);
+
+            $validated['perlu_pengantar'] = $request->has('perlu_pengantar') ? 1 : 0;
+
+            $jenisSurat->update([
+                'nama' => $validated['nama'],
+                'kode_surat' => $validated['kode_surat'],
+                'perlu_pengantar' => $validated['perlu_pengantar'],
+            ]);
+
+            return redirect()->route('admin.dataJenisSurat')
+                ->with('success', 'Jenis surat berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteJenisSurat(jenis_surat $jenisSurat) {
+        try {
+            $jenisSurat->delete();
+
+            return redirect()->route('admin.dataJenisSurat')
+                ->with('success', 'Jenis surat berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Tidak dapat menghapus jenis surat: ' . $e->getMessage());
+        }
+    }
+}
 

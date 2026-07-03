@@ -18,6 +18,9 @@
     <div class="page-wrapper">
         @include('layouts.header')
         <div class="page-body">
+            <div class="container-xl">
+                @include('components.alert')
+            </div>
             @yield('content')
         </div>
     </div>

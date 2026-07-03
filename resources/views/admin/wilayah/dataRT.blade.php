@@ -7,6 +7,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Data Wilayah RT</h3>
+             <a href="{{ route('admin.wilayah.rt.create') }}" class="btn btn-sm btn-primary">Tambah Wilayah RT</a>
         </div>
 
         <div class="card-body">

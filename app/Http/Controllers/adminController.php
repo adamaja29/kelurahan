@@ -42,30 +42,43 @@ class adminController extends Controller {
 
 
     public function updateWarga(Request $request, Warga $warga) {
-        $validated = $request->validate([
-            'rt_id' => ['required', 'integer'],
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:warga,email,' . $warga->id],
-            'no_hp' => ['required', 'string', 'max:20'],
-            'alamat' => ['required', 'string', 'max:255'],
-            'password' => ['nullable', 'string', 'min:8'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'rt_id' => ['required', 'integer'],
+                'nama' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:warga,email,' . $warga->id],
+                'no_hp' => ['required', 'string', 'max:20'],
+                'alamat' => ['required', 'string', 'max:255'],
+                'password' => ['nullable', 'string', 'min:8'],
+            ]);
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+            if (!empty($validated['password'])) {
+                $validated['password'] = Hash::make($validated['password']);
+            } else {
+                unset($validated['password']);
+            }
+
+            $warga->update($validated);
+
+            return redirect()->route('admin.dataWarga')
+                ->with('success', 'Data warga berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
         }
-
-        $warga->update($validated);
-
-        return redirect()->route('admin.dataWarga')->with('success', 'Data warga berhasil diperbarui.');
     }
 
     public function deleteWarga(Warga $warga) {
-        $warga->delete();
+        try {
+            $warga->delete();
 
-        return redirect()->route('admin.dataWarga')->with('success', 'Data warga berhasil dihapus.');
+            return redirect()->route('admin.dataWarga')
+                ->with('success', 'Data warga berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Tidak dapat menghapus data warga: ' . $e->getMessage());
+        }
     }
 
 
@@ -110,22 +123,29 @@ class adminController extends Controller {
     }
 
     public function storeRTUser(Request $request) {
-        $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
-            'rt_id' => ['required', 'integer', 'exists:rt,id'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'nama' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'password' => ['required', 'string', 'min:8'],
+                'rt_id' => ['required', 'integer', 'exists:rt,id'],
+            ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-        $validated['role'] = 'rt';
+            $validated['password'] = Hash::make($validated['password']);
+            $validated['role'] = 'rt';
 
-        $rtModel = rt::with('rw')->findOrFail($validated['rt_id']);
-        $validated['rw_id'] = $rtModel->rw_id;
+            $rtModel = rt::with('rw')->findOrFail($validated['rt_id']);
+            $validated['rw_id'] = $rtModel->rw_id;
 
-        User::create($validated);
+            User::create($validated);
 
-        return redirect()->route('admin.dataRT')->with('success', 'Data user RT berhasil ditambahkan.');
+            return redirect()->route('admin.dataRT')
+                ->with('success', 'Data user RT berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
     }
 
     public function editRTUser(User $user) {
@@ -136,33 +156,46 @@ class adminController extends Controller {
     }
 
     public function updateRTUser(Request $request, User $user) {
-        abort_unless($user->role === 'rt', 404);
-        $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'string', 'min:8'],
-            'rt_id' => ['required', 'integer', 'exists:rt,id'],
-        ]);
+        try {
+            abort_unless($user->role === 'rt', 404);
+            $validated = $request->validate([
+                'nama' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+                'password' => ['nullable', 'string', 'min:8'],
+                'rt_id' => ['required', 'integer', 'exists:rt,id'],
+            ]);
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+            if (!empty($validated['password'])) {
+                $validated['password'] = Hash::make($validated['password']);
+            } else {
+                unset($validated['password']);
+            }
+
+            $rtModel = rt::with('rw')->findOrFail($validated['rt_id']);
+            $validated['rw_id'] = $rtModel->rw_id;
+
+            $user->update($validated);
+
+            return redirect()->route('admin.dataRT')
+                ->with('success', 'Data user RT berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
         }
-
-        $rtModel = rt::with('rw')->findOrFail($validated['rt_id']);
-        $validated['rw_id'] = $rtModel->rw_id;
-
-        $user->update($validated);
-
-        return redirect()->route('admin.dataRT')->with('success', 'Data user RT berhasil diperbarui.');
     }
 
     public function deleteRTUser(User $user) {
-        abort_unless($user->role === 'rt', 404);
-        $user->delete();
+        try {
+            abort_unless($user->role === 'rt', 404);
+            $user->delete();
 
-        return redirect()->route('admin.dataRT')->with('success', 'Data user RT berhasil dihapus.');
+            return redirect()->route('admin.dataRT')
+                ->with('success', 'Data user RT berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Tidak dapat menghapus data user RT: ' . $e->getMessage());
+        }
     }
 
 
@@ -194,14 +227,20 @@ class adminController extends Controller {
     }
 
     public function deleteUser(User $user) {
-        $user->delete();
-        $redirectRoute = match ($user->role) {
-            'rt' => 'admin.dataRT',
-            'rw' => 'admin.dataRW',
-            default => 'admin.dataLurah',
-        };
+        try {
+            $user->delete();
+            $redirectRoute = match ($user->role) {
+                'rt' => 'admin.dataRT',
+                'rw' => 'admin.dataRW',
+                default => 'admin.dataLurah',
+            };
 
-        return redirect()->route($redirectRoute)->with('success', 'Data user berhasil dihapus.');
+            return redirect()->route($redirectRoute)
+                ->with('success', 'Data user berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Tidak dapat menghapus data user: ' . $e->getMessage());
+        }
     }
 
 
@@ -217,14 +256,21 @@ class adminController extends Controller {
     }
 
     public function storeWilayahRW(Request $request) {
-        $validated = $request->validate([
-            'nomor_rw' => ['required', 'string', 'max:255'],
-            'nama_wilayah' => ['required', 'string', 'max:255'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'nomor_rw' => ['required', 'string', 'max:255', 'unique:rw,nomor_rw'],
+                'nama_wilayah' => ['required', 'string', 'max:255'],
+            ]);
 
-        rw::create($validated);
+            rw::create($validated);
 
-        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil ditambahkan.');
+            return redirect()->route('admin.wilayah.rw')
+                ->with('success', 'Data RW berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
     }
 
     public function editWilayahRW(rw $rwModel) {
@@ -232,20 +278,33 @@ class adminController extends Controller {
     }
 
     public function updateWilayahRW(Request $request, rw $rwModel) {
-        $validated = $request->validate([
-            'nomor_rw' => ['required', 'string', 'max:255'],
-            'nama_wilayah' => ['required', 'string', 'max:255'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'nomor_rw' => ['required', 'string', 'max:255', 'unique:rw,nomor_rw,' . $rwModel->id],
+                'nama_wilayah' => ['required', 'string', 'max:255'],
+            ]);
 
-        $rwModel->update($validated);
+            $rwModel->update($validated);
 
-        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil diperbarui.');
+            return redirect()->route('admin.wilayah.rw')
+                ->with('success', 'Data RW berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+        }
     }
 
     public function deleteWilayahRW(rw $rwModel) {
-        $rwModel->delete();
+        try {
+            $rwModel->delete();
 
-        return redirect()->route('admin.wilayah.rw')->with('success', 'Data RW berhasil dihapus.');
+            return redirect()->route('admin.wilayah.rw')
+                ->with('success', 'Data RW berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Tidak dapat menghapus data RW karena masih memiliki relasi dengan data lain: ' . $e->getMessage());
+        }
     }
 
 
@@ -257,26 +316,89 @@ class adminController extends Controller {
     }
 
     public function createWilayahRT() {
-        return view('admin.wilayah.tambahRT');
+        $rws = Rw::orderBy('nomor_rw')->get();
+
+        return view('admin.wilayah.tambahRT', compact('rws'));
+    }
+
+    public function storeWilayahRT(Request $request) {
+        try {
+            $request->validate([
+                'rw_id' => 'required|exists:rw,id',
+                'nomor_rt' => 'required|max:3|numeric',
+            ]);
+
+            // Check if RT already exists for this RW
+            $existingRT = Rt::where('rw_id', $request->rw_id)
+                            ->where('nomor_rt', $request->nomor_rt)
+                            ->first();
+
+            if ($existingRT) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'RT ' . $request->nomor_rt . ' untuk RW ini sudah ada. Gunakan nomor RT yang berbeda.');
+            }
+
+            Rt::create([
+                'rw_id' => $request->rw_id,
+                'nomor_rt' => $request->nomor_rt,
+            ]);
+
+            return redirect()->route('admin.wilayah.rt')
+                ->with('success', 'Data RT berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
     }
 
     public function editWilayahRT(rt $rtModel) {
-        return view('admin.wilayah.editRT', ['rtModel' => $rtModel]);
+        $rws = Rw::orderBy('nomor_rw')->get();
+        
+        return view('admin.wilayah.editRT', compact('rtModel', 'rws'));
     }
 
     public function updateWilayahRT(Request $request, rt $rtModel) {
-        $validated = $request->validate([
-            'nomor_rt' => ['required', 'string', 'max:255'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'rw_id' => 'required|exists:rw,id',
+                'nomor_rt' => 'required|max:3|numeric',
+            ]);
 
-        $rtModel->update($validated);
+            // Check if RT already exists for this RW (excluding current RT)
+            $existingRT = Rt::where('rw_id', $validated['rw_id'])
+                            ->where('nomor_rt', $validated['nomor_rt'])
+                            ->where('id', '!=', $rtModel->id)
+                            ->first();
 
-        return redirect()->route('admin.wilayah.rt')->with('success', 'Data RT berhasil diperbarui.');
+            if ($existingRT) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'RT ' . $validated['nomor_rt'] . ' untuk RW ini sudah ada. Gunakan nomor RT yang berbeda.');
+            }
+
+            $rtModel->update($validated);
+
+            return redirect()->route('admin.wilayah.rt')
+                ->with('success', 'Data RT berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+        }
     }
 
     public function deleteWilayahRT(rt $rtModel) {
-        $rtModel->delete();
+        try {
+            $rtModel->delete();
 
-        return redirect()->route('admin.wilayah.rt')->with('success', 'Data RT berhasil dihapus.');
+            return redirect()->route('admin.wilayah.rt')
+                ->with('success', 'Data RT berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Tidak dapat menghapus data RT karena masih memiliki relasi dengan data lain: ' . $e->getMessage());
+        }
     }
-}
+    }
+

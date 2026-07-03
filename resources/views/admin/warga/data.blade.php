@@ -10,11 +10,11 @@
         </div>
 
         <div class="card-body">
-            @if(session('success'))
+            <!-- @if(session('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}
                 </div>
-            @endif
+            @endif -->
 
             <form action="{{ route('admin.dataWarga') }}" method="GET" class="row g-2 mb-3">
                 <div class="col-md-8">

@@ -20,12 +20,12 @@ return new class extends Migration
 
             $table->string('nomor_surat')->nullable();
 
-            $table->text('keperluan');
+            $table->json('data_pengajuan');
 
             $table->enum('status', [
                 'menunggu_rt',
-                'ditolak_rt',
                 'menunggu_rw',
+                'ditolak_rt',
                 'ditolak_rw',
                 'selesai'
             ])->default('menunggu_rt');

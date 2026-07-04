@@ -31,9 +31,9 @@
             transition: max-width 0.4s ease-in-out, transform 0.3s ease;
         }
 
-        .responsive-logo:hover {
+        /* .responsive-logo:hover {
             transform: scale(1.03);
-        }
+        } */
 
         @media (min-width: 1400px) {
             .responsive-logo {

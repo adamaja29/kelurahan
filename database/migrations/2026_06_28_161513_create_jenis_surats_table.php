@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('jenis_surat', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('kode_surat');
+            $table->string('kode_surat')->unique();
             $table->boolean('perlu_pengantar')->default(false);
             $table->timestamps();
         });

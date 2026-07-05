@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Warga\SuratPengantarController;
 
 
 // Login Petugas
@@ -98,6 +99,8 @@ Route::middleware(['role:admin'])->group(function () {
     Route::get('/admin/jenis-surat/{jenisSurat}/edit', [adminController::class, 'editJenisSurat'])->name('admin.jenisSurat.edit');
     Route::put('/admin/jenis-surat/{jenisSurat}', [adminController::class, 'updateJenisSurat'])->name('admin.jenisSurat.update');
     Route::delete('/admin/jenis-surat/{jenisSurat}', [adminController::class, 'deleteJenisSurat'])->name('admin.jenisSurat.delete');
+
+    
 });
 
 Route::middleware(['role:rw'])->group(function () {
@@ -115,7 +118,14 @@ Route::middleware(['role:lurah'])->group(function () {
 
 Route::middleware('auth:warga')->group(function () {
     Route::get('/warga/dashboard', [dashboardController::class, 'wargaDashboard'])->name('warga.dashboard');
+
+    Route::get('/warga/surat-pengantar/saya', [SuratPengantarController::class, 'suratSaya'])->name('warga.suratPengantar.saya');
+
+    Route::get('/warga/surat-pengantar', [SuratPengantarController::class, 'index'])->name('warga.suratPengantar.index');
+    Route::get('/warga/surat-pengantar/create/{jenisSurat:kode_surat}', [SuratPengantarController::class, 'create'])->name('warga.suratPengantar.create');
+    Route::post('/warga/surat-pengantar', [SuratPengantarController::class, 'store'])->name('warga.suratPengantar.store');
 });
+
 
 
 
